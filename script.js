@@ -40,6 +40,15 @@ document.addEventListener('DOMContentLoaded', function () {
   const step2 = form ? form.querySelector('.form-step[data-step="2"]') : null;
   const nextBtn = form ? form.querySelector('#next-step') : null;
   const prevBtn = form ? form.querySelector('#prev-step') : null;
+  const phoneInput = form ? form.querySelector('input[name="phone"]') : null;
+  let iti = null;
+  if (phoneInput && window.intlTelInput) {
+    iti = window.intlTelInput(phoneInput, {
+      initialCountry: 'auto',
+      utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js',
+      geoIpLookup: (cb) => { fetch('https://ipapi.co/json').then(res => res.json()).then(d => cb(d.country_code)).catch(() => cb('US')); }
+    });
+  }
 
   const goStep = (n) => {
     if (!step1 || !step2) return;
@@ -51,7 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const name = form.querySelector('input[name="name"]').value.trim();
     const company = form.querySelector('input[name="company"]').value.trim();
     const email = form.querySelector('input[name="email"]').value.trim();
-    if (!name || !company || !email) { alert('Please complete name, company, and email.'); return; }
+    const phoneValid = iti ? iti.isValidNumber() : (phoneInput && phoneInput.value.trim().length >= 7);
+    if (!name || !company || !email || !phoneValid) { alert('Please complete name, company, email, and a valid phone number.'); return; }
     goStep(2);
   });
   if (prevBtn) prevBtn.addEventListener('click', () => goStep(1));
@@ -74,7 +84,8 @@ document.addEventListener('DOMContentLoaded', function () {
         { name: 'firstname', value: data.name || '' },
         { name: 'company', value: data.company || '' },
         { name: 'email', value: data.email || '' },
-        { name: 'phone', value: data.phone || '' },
+        { name: 'phone', value: (iti && iti.getNumber()) || data.phone || '' },
+        { name: 'country', value: (iti && iti.getSelectedCountryData && iti.getSelectedCountryData().name) || '' },
         { name: 'lifecyclestage', value: 'lead' },
         { name: 'message', value: data.message || '' },
         { name: 'company_size__c', value: data.size || '' },
