@@ -5,6 +5,6 @@
     HUBSPOT_PORTAL_ID: '',
     HUBSPOT_FORM_ID: '',
     CALENDLY_URL: 'https://calendly.com/',
-    LEADS_ENDPOINT: 'https://ky633fye82.execute-api.ap-south-1.amazonaws.com/send-lead'
+    LEADS_ENDPOINT: '/api/send-lead'
   };
 })();
