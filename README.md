@@ -53,3 +53,18 @@ HubSpot field mappings (adjust in your portal if needed):
 
 ## License
 Internal use. Content © GCCSETUPINDIA.
+
+## Serverless lead endpoint (Resend)
+We include a Lambda handler at `server/send-lead/index.js` (Node 18). Deploy via Amplify Function or API Gateway + Lambda and set env vars:
+- `RESEND_API_KEY`
+- `TO_EMAIL` (e.g., hello@gccsetupindia.com)
+- `FROM_EMAIL` (e.g., leads@gccsetupindia.com)
+- `ALLOW_ORIGIN` (optional, e.g., https://gccsetupindia.com)
+
+Set the frontend to use it by updating `config.js` → `LEADS_ENDPOINT`: e.g., `https://your-domain/api/send-lead`.
+
+### Amplify quick steps
+1. In Amplify console, add a Function “send-lead” (Node 18). Paste the code from `server/send-lead/index.js`.
+2. Add environment variables. Grant basic internet egress (no AWS perms required).
+3. Create an API route (HTTP API / API Gateway) to proxy `POST /api/send-lead` to the function.
+4. Update `config.js` `LEADS_ENDPOINT` with the API URL and redeploy.

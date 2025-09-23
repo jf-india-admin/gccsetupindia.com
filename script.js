@@ -71,45 +71,82 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
       console.log('Form submitted', data);
-      // HubSpot Forms submission
-      const PORTAL_ID = (window.SITE_CONFIG && window.SITE_CONFIG.HUBSPOT_PORTAL_ID) || '';
-      const FORM_ID = (window.SITE_CONFIG && window.SITE_CONFIG.HUBSPOT_FORM_ID) || '';
-      const hutk = (document.cookie.match(/hubspotutk=([^;]+)/) || [])[1] || '';
-      const context = {
-        hutk,
-        pageUri: window.location.href,
-        pageName: document.title
+
+      // Build common payload
+      const payload = {
+        name: data.name || '',
+        company: data.company || '',
+        email: data.email || '',
+        phone: (iti && iti.getNumber()) || data.phone || '',
+        country: (iti && iti.getSelectedCountryData && iti.getSelectedCountryData().name) || '',
+        size: data.size || '',
+        industry: data.industry || '',
+        function: data.function || '',
+        message: data.message || '',
+        variant: document.querySelector('.ab:not(.hidden)')?.classList?.contains('ab-b') ? 'B' : 'A',
+        utm_source: new URLSearchParams(location.search).get('utm_source') || '',
+        utm_medium: new URLSearchParams(location.search).get('utm_medium') || '',
+        utm_campaign: new URLSearchParams(location.search).get('utm_campaign') || ''
       };
+
+      const cfg = window.SITE_CONFIG || {};
+      const redirect = cfg.CALENDLY_URL || 'https://calendly.com/';
+
+      // If LEADS_ENDPOINT is configured, send to serverless (Resend-backed)
+      if (cfg.LEADS_ENDPOINT) {
+        fetch(cfg.LEADS_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error('Lead endpoint failed');
+            return res.json().catch(() => ({}));
+          })
+          .then(() => {
+            alert('Thanks! We will reach out within 24 hours.');
+            sendEvent('form_submit_resend');
+            window.location.href = redirect;
+          })
+          .catch((err) => {
+            console.error('Lead endpoint error', err);
+            alert('Submission failed. Please try again or email hello@gccsetupindia.com');
+          });
+        return;
+      }
+
+      // Fallback: HubSpot Forms submission (if configured)
+      const PORTAL_ID = (cfg.HUBSPOT_PORTAL_ID) || '';
+      const FORM_ID = (cfg.HUBSPOT_FORM_ID) || '';
+      if (!PORTAL_ID || !FORM_ID) { alert('Form is not configured yet. Please set LEADS_ENDPOINT or HubSpot IDs in config.js'); return; }
+      const hutk = (document.cookie.match(/hubspotutk=([^;]+)/) || [])[1] || '';
+      const context = { hutk, pageUri: window.location.href, pageName: document.title };
       const fields = [
-        { name: 'firstname', value: data.name || '' },
-        { name: 'company', value: data.company || '' },
-        { name: 'email', value: data.email || '' },
-        { name: 'phone', value: (iti && iti.getNumber()) || data.phone || '' },
-        { name: 'country', value: (iti && iti.getSelectedCountryData && iti.getSelectedCountryData().name) || '' },
+        { name: 'firstname', value: payload.name },
+        { name: 'company', value: payload.company },
+        { name: 'email', value: payload.email },
+        { name: 'phone', value: payload.phone },
+        { name: 'country', value: payload.country },
         { name: 'lifecyclestage', value: 'lead' },
-        { name: 'message', value: data.message || '' },
-        { name: 'company_size__c', value: data.size || '' },
-        { name: 'primary_function__c', value: data.function || '' },
-        { name: 'industry', value: data.industry || '' }
+        { name: 'message', value: payload.message },
+        { name: 'company_size', value: payload.size },
+        { name: 'primary_function', value: payload.function },
+        { name: 'industry', value: payload.industry }
       ];
-      if (!PORTAL_ID || !FORM_ID) { alert('Form is not configured yet. Please set HUBSPOT IDs in config.js'); return; }
       fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_ID}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fields, context })
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields, context })
       })
-      .then((res) => res.json())
-      .then((json) => {
-        console.log('HubSpot response', json);
-        alert('Thanks! We will reach out within 24 hours.');
-        sendEvent('form_submit_hubspot');
-        const redirect = (window.SITE_CONFIG && window.SITE_CONFIG.CALENDLY_URL) || 'https://calendly.com/';
-        window.location.href = redirect;
-      })
-      .catch((err) => {
-        console.error('HubSpot submit failed', err);
-        alert('Submission failed. Please try again or email hello@indgcc.example');
-      });
+        .then((res) => res.json())
+        .then((json) => {
+          console.log('HubSpot response', json);
+          alert('Thanks! We will reach out within 24 hours.');
+          sendEvent('form_submit_hubspot');
+          window.location.href = redirect;
+        })
+        .catch((err) => {
+          console.error('HubSpot submit failed', err);
+          alert('Submission failed. Please try again or email hello@gccsetupindia.com');
+        });
     });
   }
 
