@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
       geoIpLookup: (cb) => { fetch('https://ipapi.co/json').then(res => res.json()).then(d => cb(d.country_code)).catch(() => cb('US')); }
     });
   }
+  const successPanel = document.getElementById('form-success');
 
   const goStep = (n) => {
     if (!step1 || !step2) return;
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
       };
 
       const cfg = window.SITE_CONFIG || {};
-      const redirect = cfg.CALENDLY_URL || 'https://calendly.com/';
+      const redirect = null; // temporarily disabled Calendly redirect
 
       // If LEADS_ENDPOINT is configured, send to serverless (Resend-backed)
       if (cfg.LEADS_ENDPOINT) {
@@ -104,9 +105,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return res.json().catch(() => ({}));
           })
           .then(() => {
-            alert('Thanks! We will reach out within 24 hours.');
+            if (form && successPanel) { form.classList.add('hidden'); successPanel.classList.remove('hidden'); }
             sendEvent('form_submit_resend');
-            window.location.href = redirect;
+            // no redirect
           })
           .catch((err) => {
             console.error('Lead endpoint error', err);
@@ -139,9 +140,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((json) => {
           console.log('HubSpot response', json);
-          alert('Thanks! We will reach out within 24 hours.');
+          if (form && successPanel) { form.classList.add('hidden'); successPanel.classList.remove('hidden'); }
           sendEvent('form_submit_hubspot');
-          window.location.href = redirect;
+          // no redirect
         })
         .catch((err) => {
           console.error('HubSpot submit failed', err);
