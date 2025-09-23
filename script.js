@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
       geoIpLookup: (cb) => { fetch('https://ipapi.co/json').then(res => res.json()).then(d => cb(d.country_code)).catch(() => cb('US')); }
     });
   }
+  const successPanel = document.getElementById('form-success');
 
   const goStep = (n) => {
     if (!step1 || !step2) return;
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return res.json().catch(() => ({}));
           })
           .then(() => {
-            alert('Thanks! We will reach out within 24 hours.');
+            if (form && successPanel) { form.classList.add('hidden'); successPanel.classList.remove('hidden'); }
             sendEvent('form_submit_resend');
             // no redirect
           })
@@ -139,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((json) => {
           console.log('HubSpot response', json);
-          alert('Thanks! We will reach out within 24 hours.');
+          if (form && successPanel) { form.classList.add('hidden'); successPanel.classList.remove('hidden'); }
           sendEvent('form_submit_hubspot');
           // no redirect
         })

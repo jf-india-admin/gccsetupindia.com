@@ -173,6 +173,9 @@ p { margin: 0 0 12px; }
 .form-step.hidden { display: none; }
 .form-actions { margin-top: 8px; display: flex; gap: 10px; }
 .form-actions.row { justify-content: space-between; }
+.form-success { margin-top: 12px; text-align: left; display: grid; gap: 8px; }
+.form-success.hidden { display: none; }
+.success-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; }
 
 /* Process */
 .steps { display: grid; grid-template-columns: 1fr; gap: 14px; padding-left: 0; list-style: none; counter-reset: step; }
