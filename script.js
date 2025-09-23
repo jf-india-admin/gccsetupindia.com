@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
       };
 
       const cfg = window.SITE_CONFIG || {};
-      const redirect = cfg.CALENDLY_URL || 'https://calendly.com/';
+      const redirect = null; // temporarily disabled Calendly redirect
 
       // If LEADS_ENDPOINT is configured, send to serverless (Resend-backed)
       if (cfg.LEADS_ENDPOINT) {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
           .then(() => {
             alert('Thanks! We will reach out within 24 hours.');
             sendEvent('form_submit_resend');
-            window.location.href = redirect;
+            // no redirect
           })
           .catch((err) => {
             console.error('Lead endpoint error', err);
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
           console.log('HubSpot response', json);
           alert('Thanks! We will reach out within 24 hours.');
           sendEvent('form_submit_hubspot');
-          window.location.href = redirect;
+          // no redirect
         })
         .catch((err) => {
           console.error('HubSpot submit failed', err);
