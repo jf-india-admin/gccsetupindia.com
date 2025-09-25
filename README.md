@@ -18,8 +18,7 @@ A high-converting static landing page offering mid-sized companies an end‑to�
 - `config.js` – site configuration (IDs/URLs)
 - `favicon.svg` – brand favicon
 - `solutions.html` – For BFSI (services overview + detail sections)
-- Other standalone pages kept: `bfsi-gcc.html`, `case-studies.html`, `tco-calculator.html`, `project-plan.html`, `checklist.html`, `partner-marketplace.html`, `compliance-hub.html`, `location-comparison.html`
-- Removed pages: Why India, Playbooks, Resources, and service detail pages (now inline)
+- Removed pages: Why India, Playbooks, Resources, legacy service detail pages, and other standalone pages not linked (now consolidated)
 
 ## Local development
 ```bash
