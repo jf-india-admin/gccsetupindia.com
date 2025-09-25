@@ -25,10 +25,17 @@ exports.handler = async (event) => {
 
   try {
     const data = typeof event.body === 'string' ? JSON.parse(event.body || '{}') : (event.body || {});
-    const { name, company, email, phone, country, size, industry, function: primaryFunction, message, variant, utm_source, utm_medium, utm_campaign } = data;
+    const { name, company, email, phone, country, size, industry, function: primaryFunction, message, variant, utm_source, utm_medium, utm_campaign, role, timeline, city, consent, magnet } = data;
 
-    if (!name || !company || !email || !phone) {
-      return json(400, { ok: false, error: 'Missing required fields' }, origin);
+    // Validation: lead magnets vs consultation
+    if (magnet) {
+      if (!name || !email) {
+        return json(400, { ok: false, error: 'Missing required fields' }, origin);
+      }
+    } else {
+      if (!name || !company || !email || !phone) {
+        return json(400, { ok: false, error: 'Missing required fields' }, origin);
+      }
     }
 
     const html = `
@@ -39,16 +46,21 @@ exports.handler = async (event) => {
           <tr><td><strong>Name</strong></td><td>${escapeHtml(name)}</td></tr>
           <tr><td><strong>Company</strong></td><td>${escapeHtml(company)}</td></tr>
           <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
-          <tr><td><strong>Phone</strong></td><td>${escapeHtml(phone)} ${country ? '(' + escapeHtml(country) + ')' : ''}</td></tr>
+          <tr><td><strong>Phone</strong></td><td>${escapeHtml(phone || '')} ${country ? '(' + escapeHtml(country) + ')' : ''}</td></tr>
           <tr><td><strong>Company size</strong></td><td>${escapeHtml(size || '')}</td></tr>
           <tr><td><strong>Industry</strong></td><td>${escapeHtml(industry || '')}</td></tr>
           <tr><td><strong>Primary function</strong></td><td>${escapeHtml(primaryFunction || '')}</td></tr>
           <tr><td><strong>Message</strong></td><td>${escapeHtml(message || '')}</td></tr>
+          ${magnet ? `<tr><td><strong>Magnet</strong></td><td>${escapeHtml(magnet)}</td></tr>` : ''}
+          ${role ? `<tr><td><strong>Role</strong></td><td>${escapeHtml(role)}</td></tr>` : ''}
+          ${timeline ? `<tr><td><strong>Timeline</strong></td><td>${escapeHtml(timeline)}</td></tr>` : ''}
+          ${city ? `<tr><td><strong>City</strong></td><td>${escapeHtml(city)}</td></tr>` : ''}
+          ${typeof consent !== 'undefined' ? `<tr><td><strong>Consent</strong></td><td>${escapeHtml(String(consent))}</td></tr>` : ''}
         </table>
         <p style="margin-top:12px;color:#475569">UTM: ${escapeHtml(utm_source || '')} / ${escapeHtml(utm_medium || '')} / ${escapeHtml(utm_campaign || '')}</p>
       </div>`;
 
-    const subject = `New lead: ${name} — ${company}`;
+    const subject = magnet ? `New magnet lead (${magnet}): ${name} — ${company || ''}` : `New lead: ${name} — ${company}`;
 
     const resp = await fetch(RESEND_API, {
       method: 'POST',

@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
       geoIpLookup: (cb) => { fetch('https://ipapi.co/json').then(res => res.json()).then(d => cb(d.country_code)).catch(() => cb('US')); }
     });
   }
-  const successPanel = document.getElementById('form-success');
 
   const goStep = (n) => {
     if (!step1 || !step2) return;
@@ -91,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
       };
 
       const cfg = window.SITE_CONFIG || {};
-      const redirect = null; // temporarily disabled Calendly redirect
+      const redirect = cfg.CALENDLY_URL || 'https://calendly.com/';
 
       // If LEADS_ENDPOINT is configured, send to serverless (Resend-backed)
       if (cfg.LEADS_ENDPOINT) {
@@ -105,9 +104,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return res.json().catch(() => ({}));
           })
           .then(() => {
-            if (form && successPanel) { form.classList.add('hidden'); successPanel.classList.remove('hidden'); }
+            alert('Thanks! We will reach out within 24 hours.');
             sendEvent('form_submit_resend');
-            // no redirect
+            window.location.href = redirect;
           })
           .catch((err) => {
             console.error('Lead endpoint error', err);
@@ -140,9 +139,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((json) => {
           console.log('HubSpot response', json);
-          if (form && successPanel) { form.classList.add('hidden'); successPanel.classList.remove('hidden'); }
+          alert('Thanks! We will reach out within 24 hours.');
           sendEvent('form_submit_hubspot');
-          // no redirect
+          window.location.href = redirect;
         })
         .catch((err) => {
           console.error('HubSpot submit failed', err);
@@ -200,6 +199,25 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('a.btn, .btn').forEach((el) => {
     el.addEventListener('click', () => sendEvent('cta_click', { id: el.textContent.trim() }));
   });
+
+  // For BFSI page: inline service detail toggles
+  const serviceCards = document.querySelectorAll('.service-card[data-target]');
+  if (serviceCards.length) {
+    serviceCards.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const sel = btn.getAttribute('data-target');
+        if (!sel) return;
+        // hide others
+        document.querySelectorAll('#details .service-detail').forEach((d) => d.classList.add('hidden'));
+        const target = document.querySelector(sel);
+        if (target) {
+          target.classList.remove('hidden');
+          // smooth scrolling; keep focus for accessibility
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  }
 
   // Track FAQ opens
   document.querySelectorAll('.faq-list details').forEach((d) => {
