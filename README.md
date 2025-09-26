@@ -5,23 +5,29 @@ A high-converting static landing page offering mid-sized companies an end‑to�
 ## Features
 - Light theme inspired by Positivus, fully responsive
 - Hero A/B variants with analytics events
-- Services, Why Now, Process, Case Studies (NDA-safe), Testimonials
-- Contact form (2‑step) with phone country dropdown and HubSpot Forms API
+- For BFSI page with inline expandable service details
+- Why Now, Process, Case Studies (NDA-safe), Testimonials
+- Contact form (2‑step) on homepage; all CTAs scroll to this form
 - ROI calculator with live savings estimate
 - Sticky CTA bar, SEO meta, JSON‑LD (Organization + FAQ), config-driven IDs
 
 ## Project structure
-- `index.html` – markup and sections
+- `index.html` – homepage (About us, Services, Use Cases, contact form)
 - `styles.css` – styles and theme tokens
 - `script.js` – interactions, analytics wiring, form wizard, ROI calc
 - `config.js` – site configuration (IDs/URLs)
 - `favicon.svg` – brand favicon
+- `solutions.html` – For BFSI (services overview + detail sections)
+- Removed pages: Why India, Playbooks, Resources, legacy service detail pages, and other standalone pages not linked (now consolidated)
 
 ## Local development
 ```bash
-cd "/Users/ashishawasthi/Desktop/FrontEnd App/gcc-app"
+# Option A: simple static server
 python3 -m http.server 8080
-# Visit http://localhost:8080
+# Option B: node dev server with /api/send-lead proxy
+npm install
+npm start
+# Visit http://localhost:3000 (or 8080 for python server)
 ```
 
 ## Configuration
@@ -68,3 +74,8 @@ Set the frontend to use it by updating `config.js` → `LEADS_ENDPOINT`: e.g., `
 2. Add environment variables. Grant basic internet egress (no AWS perms required).
 3. Create an API route (HTTP API / API Gateway) to proxy `POST /api/send-lead` to the function.
 4. Update `config.js` `LEADS_ENDPOINT` with the API URL and redeploy.
+
+## Navigation
+- Header: For BFSI, About us, Services, Use Cases, “Get your free proposal” (scrolls to `#contact` on homepage)
+- Footer mirrors the same links
+- CTAs across pages point to the homepage form (`/#contact`)
