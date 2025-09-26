@@ -7,6 +7,9 @@
   <meta name="description" content="Advisory, Build-Operate, Compliance, Talent, Real Estate, Cyber & Infra solutions for BFSI GCCs in India.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script src="/config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -20,9 +23,10 @@
         <a href="/#cases">Use Cases</a>
         <a href="/#contact" class="btn btn-sm btn-primary">Get your free proposal</a>
       </nav>
-      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>☰</button>
     </div>
   </header>
+  <div class="nav-overlay" id="nav-overlay"></div>
 
   <main>
     <section class="hero">
@@ -267,15 +271,7 @@
     </section>
     </section>
 
-    <div id="sticky-cta" class="sticky-cta" role="region" aria-label="Quick actions">
-      <div class="container sticky-cta-row">
-        <span>Ready for a free proposal?</span>
-        <div class="sticky-actions">
-          <a href="/#contact" class="btn btn-ghost">Talk to us</a>
-          <a href="/#contact" class="btn btn-primary">Get your free proposal</a>
-        </div>
-      </div>
-    </div>
+    
   </main>
 
   <footer class="site-footer">

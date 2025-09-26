@@ -40,14 +40,54 @@ body {
   display: flex; align-items: center; justify-content: space-between;
   height: 64px;
 }
-.logo { font-family: var(--font-heading); font-weight: 800; letter-spacing: 0.4px; }
-.nav-links { display: none; gap: 20px; align-items: center; }
-.nav-links a { color: var(--muted); text-decoration: none; font-weight: 500; }
+.logo { font-family: var(--font-heading); font-weight: 800; letter-spacing: 0.4px; text-decoration: none; color: inherit; display: inline-block; }
+.logo:hover { text-decoration: none; }
+.nav-links {
+  display: none;
+  position: fixed;
+  top: 64px; left: 0; right: 0;
+  background: #ffffff;
+  border-top: 1px solid var(--border);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 12px 20px 24px;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  z-index: 51; /* above overlay (45) and content; within header (50) stacking context */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: transform 180ms ease, opacity 180ms ease, visibility 180ms ease;
+  pointer-events: none;
+}
+.nav-links.open { display: flex; visibility: visible; opacity: 1; transform: translateY(0); pointer-events: auto; }
+.nav-overlay { position: fixed; top: 64px; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.35); z-index: 45; opacity: 0; visibility: hidden; transition: opacity 180ms ease, visibility 180ms ease; }
+.nav-overlay.visible { opacity: 1; visibility: visible; }
+.nav-links a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: normal;
+  display: flex; align-items: center;
+  padding: 14px 4px;
+  border-bottom: 1px solid #eef2f7;
+}
+.nav-links a::after { content: '›'; margin-left: auto; color: var(--muted); font-weight: 700; }
+@media (min-width: 768px) {
+  .nav-links { position: static; display: flex !important; max-height: none; overflow: visible; background: transparent; border-top: 0; transform: none; opacity: 1; visibility: visible; pointer-events: auto; gap: 20px; align-items: center; }
+  .nav-links a { display: inline-block; border: 0; padding: 0; }
+  .nav-links a::after { content: none; }
+  .nav-toggle { display: none; }
+  .nav-overlay { display: none; }
+}
 .nav-links a:hover { color: var(--text); }
 .nav-toggle { display: inline-flex; background: transparent; border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 12px; }
+.nav-toggle.is-open { background: #0f172a; color: #ffffff; border-color: #0f172a; }
 
 /* Buttons */
-.btn { border: 1px solid var(--border); color: var(--text); text-decoration: none; padding: 12px 16px; border-radius: 16px; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.btn { border: 1px solid var(--border); color: var(--text); text-decoration: none; padding: 12px 16px; border-radius: 16px; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; white-space: nowrap; }
+.nav .btn { padding: 10px 14px; border-radius: 24px; line-height: 1; }
 .btn-sm { padding: 8px 12px; font-size: 14px; border-radius: 12px; }
 .btn-lg { padding: 14px 20px; font-size: 16px; }
 .btn-primary { background: var(--brand); border-color: transparent; }
@@ -71,7 +111,7 @@ p { margin: 0 0 12px; }
 /* Hero */
 .hero { padding: 72px 0 40px; border-bottom: 1px solid var(--border); }
 .hero-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
-.hero h1 { font-size: 44px; line-height: 1.1; margin: 0 0 12px; }
+.hero h1 { font-size: 44px; line-height: 1.1; margin: 0 0 12px; font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.02em; }
 .cta-group { display: flex; gap: 12px; flex-wrap: wrap; }
 .trust-badges { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 16px 0 0; margin: 0; list-style: none; color: var(--muted); }
 .hero-art { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: stretch; }
@@ -246,7 +286,7 @@ p { margin: 0 0 12px; }
 
 /* Responsive updates */
 @media (min-width: 768px) {
-  .nav-links { display: flex; }
+  .nav-links { display: flex; position: static; background: transparent; border: none; flex-direction: row; align-items: center; gap: 20px; padding: 0; visibility: visible; opacity: 1; transform: none; pointer-events: auto; height: auto; }
   .nav-toggle { display: none; }
   .hero-grid { grid-template-columns: 1.25fr 0.75fr; align-items: center; }
   .hero h1 { font-size: 64px; }

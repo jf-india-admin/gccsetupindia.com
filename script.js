@@ -1,15 +1,37 @@
 document.addEventListener('DOMContentLoaded', function () {
   const navToggle = document.querySelector('.nav-toggle');
   const navLinks = document.querySelector('.nav-links');
+  const navOverlay = document.getElementById('nav-overlay');
   const year = document.getElementById('year');
   if (year) year.textContent = new Date().getFullYear();
 
   if (navToggle && navLinks) {
+    const openMenu = () => {
+      navLinks.classList.add('open');
+      navToggle.setAttribute('aria-expanded', 'true');
+      navToggle.classList.add('is-open');
+      if (navOverlay) navOverlay.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+      // swap icon to cross
+      navToggle.textContent = '✕';
+    };
+    const closeMenu = () => {
+      navLinks.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+      navToggle.classList.remove('is-open');
+      if (navOverlay) navOverlay.classList.remove('visible');
+      document.body.style.overflow = '';
+      // swap back to hamburger
+      navToggle.textContent = '☰';
+    };
     navToggle.addEventListener('click', () => {
-      const isOpen = navLinks.style.display === 'flex';
-      navLinks.style.display = isOpen ? 'none' : 'flex';
-      navToggle.setAttribute('aria-expanded', String(!isOpen));
+      const isOpen = navLinks.classList.contains('open');
+      if (isOpen) closeMenu(); else openMenu();
     });
+    // Close on route/hash change
+    window.addEventListener('hashchange', closeMenu);
+    if (navOverlay) navOverlay.addEventListener('click', closeMenu);
+    navLinks.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
   }
 
   // Smooth scroll for on-page anchors
